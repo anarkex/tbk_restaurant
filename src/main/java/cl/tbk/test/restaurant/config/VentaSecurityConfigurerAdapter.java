@@ -5,7 +5,6 @@
  */
 package cl.tbk.test.restaurant.config;
 
-import java.lang.reflect.Method;
 import javax.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,14 +31,12 @@ public class VentaSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //super.configure(http); //To change body of generated methods, choose Tools | Templates.
-        http.csrf().disable().headers().frameOptions().disable();
-        http.addFilterAfter(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .antMatchers("/ventas/**")
-                .authenticated()
-                .anyRequest().permitAll();
-
+        http.csrf().disable().headers().frameOptions().disable()
+                .and().addFilterAfter(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests().antMatchers("/tbk/restaurant/v1/ventas/**").authenticated()
+                .and()
+                .authorizeRequests().anyRequest().permitAll();
+                
     }
 
 }

@@ -63,6 +63,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      */
     @Value("${auth.maxLoginAttempts}")
     private Integer maxLoginAttempts;    
+    
+    @Value("${auth.keyBits}")
+    private Integer keyBits;
 
     private Key key = null;
 
@@ -84,8 +87,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // This is my new toy, I'll try to use this wherever I can
         loginAttempts = hz.getMap(App.M_LOGIN_ATTEMPTS); // intentos de login fallido
         parameters = hz.getMap(App.M_PARAMETERS); // parámetros dinámicos
-        if (!parameters.containsKey(App.P_SECRET_KEY)) { // esto genera la clave de 32 bytes (256) para encriptar los JWT. TIENE que ser distribuido para que los otros nodos sepan como se encriptó el mio
-            String key = RandomStringUtils.random(34); // just need 256bits = 
+        if (!parameters.containsKey(App.P_SECRET_KEY)) { // esto genera la clave de 64 bytes (512 bits) para encriptar los JWT. TIENE que ser distribuido para que los otros nodos sepan como se encriptó el mio y puedan validar
+            String key = RandomStringUtils.random((int)(5+(keyBits*1.0)/8.0)); // just need 512bits = 
             parameters.putIfAbsent(App.P_SECRET_KEY, key);
         }
         try {

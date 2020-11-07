@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author manuelpinto
  */
 @RestController
-@RequestMapping("ventas")
+@RequestMapping("/tbk/restaurant/v1/ventas")
 public class VentaController {
 
     private static final Logger LOG = Logger.getLogger(VentaController.class.getName());

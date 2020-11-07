@@ -9,8 +9,6 @@ import cl.tbk.test.restaurant.entities.Credential;
 import cl.tbk.test.restaurant.exception.TooManyLoginsAttemptException;
 import cl.tbk.test.restaurant.exception.UnauthorizedException;
 import cl.tbk.test.restaurant.service.AuthenticationService;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author manuelpinto
  */
 @RestController
+@RequestMapping("/tbk/restaurant/v1")
 public class LoginController {
 
     private static final Logger LOG = Logger.getLogger(LoginController.class.getName());
@@ -57,10 +56,11 @@ public class LoginController {
      * @return 
      */
     
-    @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    @RequestMapping(value = "login", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     @ResponseBody
     public ResponseEntity<Credential> login(@RequestBody Credential credentials, HttpServletRequest request) {
         try {
+            validate(credentials);
             // we could include the remote ip in the token, just in case to try avoid session hijacking
             Credential authenticated = authService.authenticate(credentials.getUsername(), credentials.getPassword());
             ResponseEntity<Credential> response = null;
@@ -75,4 +75,18 @@ public class LoginController {
         }
     }
 
+    /**
+     * Validate credentials<br/>
+     * Just take in consideratino JSON has almost no rules and the deserialization to object
+     * is based on what json has in the payload.<br/>
+     * If the payload doesn't contains any username/password, then it will came null<br/>
+     * The NullPointerException is awful, so we need to catch it before to send, at least, an "UnauthorizedException"
+     * @param credentials 
+     */
+    private void validate(Credential credentials) throws UnauthorizedException{
+        if(credentials==null) throw new UnauthorizedException("Credential is null");
+        if(credentials.getUsername()==null) throw new UnauthorizedException("Credential Username is null");
+        if(credentials.getPassword()==null) throw new UnauthorizedException("Credential Password is null");
+        // ok ok, everything looks good now.
+    }
 }
