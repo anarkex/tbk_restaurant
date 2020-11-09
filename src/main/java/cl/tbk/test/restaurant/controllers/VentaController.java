@@ -30,7 +30,7 @@ public class VentaController {
     @Autowired
     @Qualifier("JMS+DB")
     //@Qualifier("Hazelcast+DB")
-    private RestaurantService persistenceService;
+    private RestaurantService restaurantService;
     
     public VentaController() {
     }
@@ -52,7 +52,7 @@ public class VentaController {
             venta.setTimestamp(new Date());
         Logger.getLogger(this.getClass().getCanonicalName()).info("Guardando la venta "+venta.getId()+" "+venta.getTimestamp());
         try{
-            persistenceService.store(venta); // this validates and schedule the persistence
+            restaurantService.store(venta); // this validates and schedule the persistence
         } catch (ValidationException validationException){ // This is RuntimeException because stream.foreach on items
             return ResponseEntity.badRequest().build();
         }
@@ -73,7 +73,7 @@ public class VentaController {
     @ResponseBody
     public ResponseEntity<ResumenVentas> resumenVentas(@PathVariable("y") Integer year, @PathVariable("m") Integer month, @PathVariable("d") Integer day){
         Logger.getLogger(this.getClass().getCanonicalName()).info("Generando resumen para "+year+"-"+month+"-"+day);
-        ResumenVentas rv=persistenceService.get(year, month, day);
+        ResumenVentas rv=restaurantService.get(year, month, day);
         if(rv==null){
             return ResponseEntity.noContent().build();
         }

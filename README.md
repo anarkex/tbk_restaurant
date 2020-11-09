@@ -103,7 +103,7 @@ También dejé un export de postman para enviar peticiones.
 
 ### Este sistema necesita testing intenso. Sólo se crearon JUnit para probarlo (se ejecuta durante el build de maven).
 
-## ISSUES Conocidos:
+## ISSUES Conocidos y comentarios:
 - No va a iniciar varias veces en el mismo servidor por conflicto de puertos de activemq y h2
 - la base de datos h2 crea su datafile en el lugar donde el usuario haya levantado la aplicacion
 - Un acceso sin token a un servicio resulta en un error `403 Forbidden` en vez del que corresponde `401 Unauthorized` .
