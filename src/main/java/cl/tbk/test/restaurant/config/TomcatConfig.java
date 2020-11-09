@@ -21,14 +21,11 @@ public class TomcatConfig implements
         WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
 
     private final Integer port;
-    private final String listeningAddr;
     
     public TomcatConfig(
-            @Value("${tc.port}") Integer port,
-            @Value("${tc.ip}") String listeningAddress
+            @Value("${tc.port}") Integer port
     ) {
         this.port = port;
-        this.listeningAddr=listeningAddress;
     }
     
     /**
@@ -49,11 +46,6 @@ public class TomcatConfig implements
     public void customize(TomcatServletWebServerFactory factory) {
         factory.setContextPath("");
         factory.setPort(port);
-        try {
-            factory.setAddress(InetAddress.getByName(listeningAddr));
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(TomcatConfig.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
 }
