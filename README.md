@@ -6,6 +6,13 @@ USUARIO: transbank
 
 PASSWORD: test
 
+URL: http://<host>:8080/tbk/restaurant/v1
+
+Probado en Oracle/Sun Java 8
+
+CMD: java -jar restaurant-1.0-SNAPSHOT.jar
+
+
 el requerimiento fue:
 
 1. Exponer endpoint de login, el cual debe aceptar un nombre y usuario y contraseña, las cuales deben ser almacenadas de manera segura, como es un ejemplo, no es necesario crear un api de creación de usuario y basta con dejar en el Readme las credenciales (nombre de usuario y contraseña) creado previamente para poder simular la llamada al login exitoso.
@@ -107,9 +114,11 @@ También dejé un export de postman para enviar peticiones.
 - No va a iniciar varias veces en el mismo servidor por conflicto de puertos de activemq y h2
 - la base de datos h2 crea su datafile en el lugar donde el usuario haya levantado la aplicacion
 - Un acceso sin token a un servicio resulta en un error `403 Forbidden` en vez del que corresponde `401 Unauthorized` .
-- demora mucho en levantar
+- a veces demora bastante en levantar
 - Hay clases que no estoy seguro si deberían llamarse así o de otra forma, lo que si se es que necesita refactorizacion
 - A causa de que hoy en día todos usamos pantallas de 16:9 y nadie imprime el código en matriz de puntos es que no seguí ningúna regla de 80 caracteres de ancho.
 - El sistema esta en blanco, debes subir un par de ventas para un día en específico y luego pedir el resumen diario de ese día
 - Cambiar entre `Hazelcast` y `JMS`, para la generación del reporte, se hace cambiando el `@Qualifier` de `RestaurantService` en el `VentaController`
 - Esto necesita una pulida en cuanto a que dependencias son realmente necesarias para hacer el paquete mas pequeño
+- No tengo mucha experiencia configurando JMS/ActiveMQ, antes de esto lo había usado como POC en Glassfish 3 (hace años).
+- Hazelcast es un juguete nuevo para mi
