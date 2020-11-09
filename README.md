@@ -112,3 +112,4 @@ También dejé un export de postman para enviar peticiones.
 - A causa de que hoy en día todos usamos pantallas de 16:9 y nadie imprime el código en matriz de puntos es que no seguí ningúna regla de 80 caracteres de ancho.
 - El sistema esta en blanco, debes subir un par de ventas para un día en específico y luego pedir el resumen diario de ese día
 - Cambiar entre `Hazelcast` y `JMS`, para la generación del reporte, se hace cambiando el `@Qualifier` de `RestaurantService` en el `VentaController`
+- Esto necesita una pulida en cuanto a que dependencias son realmente necesarias para hacer el paquete mas pequeño
