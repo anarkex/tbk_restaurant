@@ -123,3 +123,4 @@ También dejé un export de postman para enviar peticiones.
 - No tengo mucha experiencia configurando JMS/ActiveMQ, antes de esto lo había usado como POC en Glassfish 3 (hace años).
 - No soy un experto con Hazelcast, pero me gusta el approach que tiene para distribuir.
 - Swagger fue algo que no conocía
+- Y, también, este sistema debería haberlo creado en varias partes con un pom padre con varios proyectos independientes para cargar según los jars que encontrase en el classpath (y cambiar de JMS a Hazelcast por jar y no por Qualifier), pero debido al tiempo se dejó así. 
