@@ -76,7 +76,9 @@ En el archivo `src/main/resources/swagger.yml` aparece como llamar a estos servi
 - No entendí bien que hay que hacer aqui, pero... hice servicios de persistencia y recuperación con *Hazelcast* y otra interfaz con *JMS*. 
 
 - *Hazelcast* : No lo he porbado con múltiples nodos, pero se supone que podria subir varias instancias del sistema en distintas maquinas (bajo la misma máscara de subred, pq funciona esn multicast) y todas funcionarian juntas. En condiciones normales cada uno de esos nodos tendria acceso a la base, pero en estas condiciones de test todos los nodos levantan una instancia h2, pero solo un nodo (el primero) trabaja como la base de datos guardando y recuperando datos usando una Queue. 
+
 La ventaja con Hazelcast es que maneja un caché en memoria distribuída de forma que si piden un resumen de ventas con espacios de menos de 5 minutos (no recuerdo cuanto le puse) el reporte se mantiene en el caché por otros 5 minutos hasta que ya nadie lo pide y se pierde, cuando se perdió y lo solicitan de nuevo el sistema lo toma de la base y lo deja disponible de nuevo. También si el reporte está en caché e ingresan una nueva venta el sistema va a refrescar el reporte si es que estba en el caché.
+
 Los resumenes se mantienen en caché indexados por fecha de ventas.
 
 En mi implementación de este sistema la generación de resumenes postea una fecha para resumen y luego se queda esperando a que aparezca en el caché de resúmenes, si demora más de 5 segundos ( `application.prperties:${resumeTimeout}` ) la petición falla por timeout.
