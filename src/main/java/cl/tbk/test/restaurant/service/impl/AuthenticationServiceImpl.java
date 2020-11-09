@@ -162,7 +162,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     /**
      * Creates a JWTToken<br/>
      * we rely on the signature to validate token authenticity<br/>
-     * OF COURSE we should use a stronger signature algorithm in prod
+     * OF COURSE we should use a stronger signature algorithm in prod<br/>
+     * You can control the expiration time from application.properties auth.timeToLive
      *
      * @param username
      * @return

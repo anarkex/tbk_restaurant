@@ -3,6 +3,7 @@
 Esta es mi prueba para postular a Transbank,
 
 USUARIO: transbank
+
 PASSWORD: test
 
 el requerimiento fue:
