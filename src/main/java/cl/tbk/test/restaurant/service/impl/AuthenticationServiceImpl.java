@@ -145,21 +145,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
-     * Get the token from the Hazelcast cluster
-     *
-     * @param token
-     * @return
-     * @throws UnauthorizedException if token is not registered
-     */
-    @Override
-    public Credential getFromToken(String token) throws UnauthorizedException {
-        Credential credential = new Credential();
-        credential.setUsername(getClaimsFromToken(token).getSubject());
-        credential.setToken(token);
-        throw new UnauthorizedException();
-    }
-
-    /**
      * Get Claims from JWToken<br/>
      * We assume that if this is well-signed then it was authenticated by us
      * @param token

@@ -48,9 +48,10 @@ public class LoginController {
      * Readme las credenciales (nombre de usuario y contraseña) creado previamente 
      * para poder simular la llamada al login exitoso.</pre>
      * 
-     * /login recive un JSON con:
-     * { "username": "<Usuario>", "password": "<Password>" }
-     * 
+     * Este es el endpoint para loguear usuarios.<br/>
+     * No tiene sentido pedirle un nombre, así que asumo que "debe aceptar un nombre y usuario y contraseña" en realidad dice
+     * "debe aceptar un nombre <u><b>de</b></u> usuario y contraseña".<br/>
+     * Si quiere ponerle un nombre está bien, pero yo lo voy a ignorar.
      * @param credentials
      * @param request
      * @return 
@@ -67,10 +68,10 @@ public class LoginController {
             response = ResponseEntity.ok(authenticated);
             return response;
         } catch (UnauthorizedException ex) {
-            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoginController.class.getName()).log(Level.WARNING, ex.getClass().getName()+" for "+(credentials==null?"NULL":credentials.getUsername()));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } catch (TooManyLoginsAttemptException ex) {
-            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoginController.class.getName()).log(Level.WARNING, ex.getClass().getName()+" for "+(credentials==null?"NULL":credentials.getUsername())+" from "+request.getRemoteAddr());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(null);
         }
     }

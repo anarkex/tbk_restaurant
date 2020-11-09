@@ -7,6 +7,7 @@ package cl.tbk.test.restaurant.entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -81,5 +82,46 @@ public class Item implements Serializable{
         if(precioUnitario!=null && cantidad!=null)
             return precioUnitario.multiply(new BigDecimal(cantidad));
         return BigDecimal.ZERO;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + Objects.hashCode(this.id);
+        hash = 53 * hash + Objects.hashCode(this.codigo);
+        hash = 53 * hash + Objects.hashCode(this.cantidad);
+        hash = 53 * hash + Objects.hashCode(this.precioUnitario);
+        hash = 53 * hash + Objects.hashCode(this.detalle);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Item other = (Item) obj;
+        if (!Objects.equals(this.detalle, other.detalle)) {
+            return false;
+        }
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.codigo, other.codigo)) {
+            return false;
+        }
+        if (!Objects.equals(this.cantidad, other.cantidad)) {
+            return false;
+        }
+        if (!Objects.equals(this.precioUnitario, other.precioUnitario)) {
+            return false;
+        }
+        return true;
     }
 }

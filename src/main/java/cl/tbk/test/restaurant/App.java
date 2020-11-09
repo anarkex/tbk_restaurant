@@ -3,7 +3,11 @@ import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
+import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -11,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author manuelpinto
  */
 @SpringBootApplication
-@EnableAutoConfiguration(exclude = {org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class,JmsAutoConfiguration.class, ActiveMQAutoConfiguration.class})
 @EnableConfigurationProperties
 @EnableEncryptableProperties
 @EnableScheduling
@@ -25,6 +29,10 @@ public class App {
     
     public static final String M_RESUMERESULT   = "resumeresult";
     public static final String M_RESUMEQUERY    = "resumequery";
+    public static final String P_DBNODE         = "db_node";
+    
+    public static final String C_RESUMEN_REQUEST= "resumen_request";
+    public static final String C_RESUMEN_RESPONSE= "resumen_response";
     
     public static void main(String[] args) {
         SpringApplication.run(cl.tbk.test.restaurant.App.class, args);

@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -32,14 +33,13 @@ public class Venta implements Serializable{
     @Id
     private UUID id;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private List<Item> items; // items de la venta
+    private List<Item> items=new ArrayList<Item>(); // items de la venta
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date timestamp; // momento de la emision de esta venta
     private Integer sucursalId; // ID de la sucursal que vendió
     private String username; // persona que registró esta venta
     
     public Venta(){
-        items=new ArrayList<>();
     }
 
     public UUID getId() {
@@ -90,6 +90,47 @@ public class Venta implements Serializable{
     public BigDecimal getMontoTotalDeVenta(){
         if(items==null || items.size()==0) return BigDecimal.ZERO;
         return items.parallelStream().map(Item::getPrecioTotal).reduce(BigDecimal.ZERO, (venta,sum)->sum.add(venta));
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 19 * hash + Objects.hashCode(this.id);
+        hash = 19 * hash + Objects.hashCode(this.items);
+        hash = 19 * hash + Objects.hashCode(this.timestamp);
+        hash = 19 * hash + Objects.hashCode(this.sucursalId);
+        hash = 19 * hash + Objects.hashCode(this.username);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Venta other = (Venta) obj;
+        if (!Objects.equals(this.username, other.username)) {
+            return false;
+        }
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.items, other.items)) {
+            return false;
+        }
+        if (!Objects.equals(this.timestamp, other.timestamp)) {
+            return false;
+        }
+        if (!Objects.equals(this.sucursalId, other.sucursalId)) {
+            return false;
+        }
+        return true;
     }
 
 }

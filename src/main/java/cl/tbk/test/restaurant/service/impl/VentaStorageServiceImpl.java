@@ -8,9 +8,11 @@ package cl.tbk.test.restaurant.service.impl;
 import cl.tbk.test.restaurant.entities.Venta;
 import cl.tbk.test.restaurant.repository.VentaRepository;
 import cl.tbk.test.restaurant.service.VentaStorageService;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class VentaStorageServiceImpl implements VentaStorageService {
 
-    private static final Logger LOG = Logger.getLogger(PersistentStorageServiceImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(VentaStorageServiceImpl.class.getName());
 
     @Autowired
     private VentaRepository repo;    
@@ -44,7 +46,10 @@ public class VentaStorageServiceImpl implements VentaStorageService {
         calendar.set(Calendar.MINUTE,59);
         calendar.set(Calendar.SECOND,59);
         calendar.set(Calendar.MILLISECOND,999);
-        return repo.getVentasByTimestampBetween(fecha, calendar.getTime());
+        List<Venta> ventas=repo.getVentasByTimestampBetween(fecha, calendar.getTime());
+        // removing persistenceBag
+        ventas.parallelStream().forEach(v->v.setItems(new ArrayList<>(v.getItems())));
+        return ventas;
     }
     
 }

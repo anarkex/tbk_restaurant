@@ -16,6 +16,5 @@ import io.jsonwebtoken.Claims;
  */
 public interface AuthenticationService {
     Credential authenticate(String username, String password) throws UnauthorizedException,TooManyLoginsAttemptException;
-    Credential getFromToken(String token) throws UnauthorizedException;
     Claims getClaimsFromToken(String token);
 }

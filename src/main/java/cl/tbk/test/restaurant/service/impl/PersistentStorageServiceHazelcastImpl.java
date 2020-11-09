@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +34,10 @@ import org.springframework.stereotype.Service;
  * @author manuelpinto
  */
 @Service
-public class PersistentStorageServiceImpl implements PersistentStorageService {    
+@Qualifier("Hazelcast+DB")
+public class PersistentStorageServiceHazelcastImpl implements PersistentStorageService {    
     
-    private static final Logger LOG = Logger.getLogger(PersistentStorageServiceImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName());
 
     @Autowired
     private VentaStorageService ventaStorage;
@@ -50,7 +52,8 @@ public class PersistentStorageServiceImpl implements PersistentStorageService {
     @Qualifier("databaseTaskExecutor")
     private TaskExecutor executor;
     
-    private static Boolean running=Boolean.FALSE;
+    @Value("${resumeTimeout}")
+    private Integer waitForResume;
     
     private BlockingQueue<Venta> toStorage;
     private BlockingQueue<Date> resumenQuery;
@@ -60,7 +63,7 @@ public class PersistentStorageServiceImpl implements PersistentStorageService {
     @Autowired
     private HazelcastInstance hz;
     
-    public PersistentStorageServiceImpl(){
+    public PersistentStorageServiceHazelcastImpl(){
     }
     
     @PostConstruct
@@ -78,7 +81,7 @@ public class PersistentStorageServiceImpl implements PersistentStorageService {
 
             @Override
             public void memberRemoved(MembershipEvent membershipEvent) {
-                if(membershipEvent.getMember().getUuid().toString().equals(params.get("db_node"))){
+                if(membershipEvent.getMember().getUuid().toString().equals(params.get(App.P_DBNODE))){
                     throw new Error("We lose the database node");
                 }
             }
@@ -87,14 +90,21 @@ public class PersistentStorageServiceImpl implements PersistentStorageService {
     
     /**
      * This chose what node will be the database node which is the one that deals with
-     * store and resume request. despite the fact that all the nodes tries to bring up the database
+     * store and resume request. despite the fact that all the nodes tries to bring up the database<br/>
+     * Still need to figure out how to not start the database when the node is not the database node<br/>
+     * in case of multiple services starts from the same working directory.<br/>
+     * Currently the second node will fail because the database file is in use<br/>
+     * <br/>
+     * This shouldn't be neccesary if a proper database is running and all the nodes access to it concurrently<br/>
+     * Enhancement is required if a database server is implemented
      */
     private void chooseDb(){
         // Choose who will be the DB
-        if(!params.containsKey("db_node")){
-            params.putIfAbsent("db_node", hz.getLocalEndpoint().getUuid().toString());
+        if(!params.containsKey(App.P_DBNODE)){
+            params.putIfAbsent(App.P_DBNODE, hz.getLocalEndpoint().getUuid().toString());
         }
-        if(hz.getLocalEndpoint().getUuid().toString().equals(params.get("db_node"))){
+        if(hz.getLocalEndpoint().getUuid().toString().equals(params.get(App.P_DBNODE))){
+            // Thread to persist the incoming ventas
             executor.execute(()->{
                 try {
                     Logger log = Logger.getLogger(this.getClass().getName());
@@ -103,26 +113,27 @@ public class PersistentStorageServiceImpl implements PersistentStorageService {
                         Venta venta=toStorage.take();
                         log.info("take new venta: "+venta.getId().toString());
                         ventaStorage.store(venta);
-                        removeResultsParaFecha(venta.getTimestamp());
+                        refreshResultsParaFecha(venta.getTimestamp());
                         log.info("saved venta: "+venta.getId().toString());
                     }
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(PersistentStorageServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
+            // Thread to consume and produce the resumenVenta
             executor.execute(()->{
                 try {
                     Logger log = Logger.getLogger(this.getClass().getName());                    
                     log.info("Starting resumeQuery consumer");
                     while(true){
                         Date queryDate = resumenQuery.take();
-                        log.info("Dealing with date "+queryDate);
+                        log.info("Generando resumen para la fecha "+queryDate);
                         ResumenVentas rv=resumenService.get(queryDate);
                         resumenResults.put(queryDate,rv);
-                        log.info("put result on resumenResult :"+rv.getFechaVentas());
+                        log.info("Colocando el resumen disponible :"+rv.getFechaVentas());
                     }
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(PersistentStorageServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
         }
@@ -131,17 +142,23 @@ public class PersistentStorageServiceImpl implements PersistentStorageService {
     /**
      * Calcula la fecha sin hora para remover el cache de esos resultados<br/>
      * Este método es necesario cuando un reporte para este día esta cachado en
-     * el servidor en el momento en que se dignó terminarlo.
+     * el servidor y aparece una venta nueva, el resumen de ese día queda inválido.
      * @param fecha 
      */
-    private void removeResultsParaFecha(Date fecha){
+    private void refreshResultsParaFecha(Date fecha){
         Calendar calendar=Calendar.getInstance();
         calendar.setTime(fecha);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND,0);
         calendar.set(Calendar.MILLISECOND,0);
-        resumenResults.remove(calendar.getTime());
+        if(resumenResults.containsKey(calendar.getTime())){
+            Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.INFO,"Refrescando el resumen para el día "+calendar.getTime());
+            resumenResults.remove(calendar.getTime());
+            try{resumenQuery.put(calendar.getTime());}catch(InterruptedException e){
+                Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.INFO,"No pude solicitar el resumen para el dia "+calendar.getTime());
+            }
+        }
     }
     
     
@@ -155,11 +172,12 @@ public class PersistentStorageServiceImpl implements PersistentStorageService {
     public Venta store(Venta venta) {
         // Storage queue is infinite
         try {
+            Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.FINE, "Storing venta "+venta.getId());
             validatorService.validate(venta);
             toStorage.put(venta);
             return venta;
         } catch (InterruptedException ex) {
-            Logger.getLogger(PersistentStorageServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException("Interrupted when trying to save venta "+venta.getId().toString());
         }
     }
@@ -173,28 +191,33 @@ public class PersistentStorageServiceImpl implements PersistentStorageService {
      */
     @Override
     public ResumenVentas get(int year, int month, int day) {
+        Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.FINE, "Getting resumen for "+year+"/"+month+"/"+day);
         Calendar calendar=Calendar.getInstance(TimeZone.getDefault());
         calendar.set(year, month-1, day, 0, 0, 0); // Why in the hell calendar uses JAN=0 DEC=11
         calendar.set(Calendar.MILLISECOND, 0);
         Date date=calendar.getTime();
         try {
-            if(!resumenResults.containsKey(date)) // si no tenemos el reporte de esta fecha en cache, lo solicitamos
-                resumenQuery.put(date);
+            if(resumenResults.containsKey(date)){ // Si tenemos el resumen lo devolvemos
+                Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.INFO, "Resumen tomado de la bolsa de resumenes");
+                return resumenResults.get(date);
+            }
+            // si no, lo solicitamos..
+            resumenQuery.put(date);
             try{
-                int ttl=10;
+                int ttl=waitForResume*5;
                 // Y nos quedamos esperando a que el resultado aparezca en el cluster.
-                // tiene un time to live de 10 medios segundos. ¿Será necesario que lo parametrice?
+                // tiene un time to live de X medios segundos.
                 while(!resumenResults.containsKey(date) && ttl-->0){
-                    Thread.sleep(500);
+                    Thread.sleep(200);
                 }
             } catch (InterruptedException e){}
             // chequeamos de nuevo porque no se si salió del ciclo por timeout o porque ya llegó el item que buscaba
-            if(resumenResults.containsKey(date))
+            if(resumenResults.containsKey(date)){
                 return resumenResults.get(date); // left this in the map until it expires
-            else
+            } else
                 throw new RuntimeException("Request Timeout"); // no apareció nada en el mapa
         } catch (InterruptedException ex) {
-            Logger.getLogger(PersistentStorageServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException("Interrupted while waiting for VentaResumen");
         }
     }

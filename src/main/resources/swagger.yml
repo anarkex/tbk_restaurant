@@ -1,0 +1,162 @@
+openapi: 3.0.1
+info:
+  version: '0.1'
+  title: Transbank Restaurant Test
+  description: Test for transbank application for job
+servers:
+  # Added by API Auto Mocking Plugin
+  # - url: https://virtserver.swaggerhub.com/anarkex/transbankRestaurant/0.1
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/anarkex/transbankRestaurant/0.1
+  - url: https://comprando.cl/tbk/restaurant/v1
+
+paths:
+  /login:
+    description: User login endpoint
+    post:
+      summary: submit an user and password and receive an user, a token and token-type
+      requestBody:
+        description: user and password specification
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/credential'
+      responses:
+        '200':
+          description: Login Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/credential'
+        '401':
+          description: Unauthorized
+  /ventas/add:
+    post:
+      description: Add venta to the system
+      security: 
+        - bearerAuth: [local]
+      requestBody:
+        description: persists a venta that is new
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/venta'
+      responses:
+        '200':
+          description: save succesful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/venta'
+  /ventas/resume/{y}/{m}/{d}:
+    get:
+      summary: display ventas for the specified day
+      security: 
+        - bearerAuth: [local]
+      parameters:
+        - in: path
+          name: y
+          schema:
+            type: integer
+          required: true
+          description: specified year in 4 digit format
+        - in: path
+          name: m
+          schema:
+            type: integer
+          required: true
+          description: specified month
+        - in: path
+          name: d
+          schema:
+            type: integer
+          required: true
+          description: specified day
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resumenVentas'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    credential:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+        token:
+          type: string
+        tokenType:
+          type: string
+    resumenVentas:
+      type: object
+      properties:
+        ventas:
+          type: array
+          items: 
+            $ref: '#/components/schemas/venta'
+        generadoTimestamp:
+          type: string
+          format: date-time
+        fechaVentas:
+          type: string
+          format: date-time
+        itemCount:
+          type: integer
+          format: int32
+        ventaCount:
+          type: integer
+          format: int32
+        montoTotal:
+          type: number
+          format: double
+    venta:
+      type: object
+      properties:
+        id: 
+          type: string
+          format: uuid
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/item'
+        timestamp:
+          type: string
+          format: date-time
+        sucursal:
+          type: integer
+        username:
+          type: string
+        montoTotalDeVenta:
+          type: number
+          format: double
+    item:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        codigo:
+          type: integer
+          format: int64
+        cantidad:
+          type: integer
+        precioUnitario:
+          type: number
+          format: double
+        detalle:
+          type: string

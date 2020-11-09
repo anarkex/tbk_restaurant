@@ -17,8 +17,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,11 +47,9 @@ public class ResumenVentasServiceImpl implements ResumenVentasService{
         rv.setItemCount(ventas.parallelStream()
                 .map(Venta::getItems).flatMap(Collection::stream)
                 .mapToInt(Item::getCantidad).sum());
-        //rv.setMontoTotal(ventas.parallelStream().map(Venta::getItems).flatMap(Collection::stream))
         rv.setMontoTotal(ventas.parallelStream().map(Venta::getItems).flatMap(Collection::stream).map(i->i.getPrecioUnitario().multiply(new BigDecimal(i.getCantidad(),MathContext.DECIMAL64))).reduce(BigDecimal.ZERO, (subtotal, value)->subtotal.add(value)));
         rv.setVentaCount(ventas.size());
         rv.setVentas(ventas);
-        // Todo: rv.setMontoTotal
         return rv;
     }
     

@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Entidad que entrega el reporte solicitado por /ventas/report/a/m/d <br/>
@@ -98,6 +99,52 @@ public class ResumenVentas implements Serializable{
     public void setMontoTotal(BigDecimal montoTotal) {
         this.montoTotal = montoTotal;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.ventas);
+        hash = 67 * hash + Objects.hashCode(this.generadoTimestamp);
+        hash = 67 * hash + Objects.hashCode(this.fechaVentas);
+        hash = 67 * hash + Objects.hashCode(this.itemCount);
+        hash = 67 * hash + Objects.hashCode(this.ventaCount);
+        hash = 67 * hash + Objects.hashCode(this.montoTotal);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ResumenVentas other = (ResumenVentas) obj;
+        if (!Objects.equals(this.ventas, other.ventas)) {
+            return false;
+        }
+        if (!Objects.equals(this.generadoTimestamp, other.generadoTimestamp)) {
+            return false;
+        }
+        if (!Objects.equals(this.fechaVentas, other.fechaVentas)) {
+            return false;
+        }
+        if (!Objects.equals(this.itemCount, other.itemCount)) {
+            return false;
+        }
+        if (!Objects.equals(this.ventaCount, other.ventaCount)) {
+            return false;
+        }
+        if (!Objects.equals(this.montoTotal, other.montoTotal)) {
+            return false;
+        }
+        return true;
+    }
+
     
     
 }
