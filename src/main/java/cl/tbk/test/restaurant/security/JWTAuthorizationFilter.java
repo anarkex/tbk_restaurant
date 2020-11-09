@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cl.tbk.test.restaurant.security;
 
 import cl.tbk.test.restaurant.service.AuthenticationService;
@@ -62,7 +57,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
         } catch (SignatureException | ExpiredJwtException | UnsupportedJwtException | MalformedJwtException e) {
             // do nothing,
             // si la ruta no necesita authorized, nos e va a fijar en el securititoken
-            // ver si tiene o no que estar autorizado es pega del websecurityconfigureAdapter
+            // de ahí ya es pega del websecurityconfigureAdapter
         }
         if (claims != null && claims.get("authorities") != null) {
             setUpSpringAuthentication(claims);
@@ -70,7 +65,6 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
         }
         filterChain.doFilter(request, response);
-        //}
     }
 
     /**

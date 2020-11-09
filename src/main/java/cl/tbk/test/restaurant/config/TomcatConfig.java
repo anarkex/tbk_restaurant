@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cl.tbk.test.restaurant.config;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -28,13 +23,20 @@ public class TomcatConfig implements
         this.port = port;
     }
     
+    /**
+     * Levanta el tomcat que manejará los endpoint rest
+     * @return 
+     */
     @Bean
     public ServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
         return tomcat;
     }
 
-
+    /**
+     * Fija los parametros de contextPath y puerto del tomcat
+     * @param factory 
+     */
     @Override
     public void customize(TomcatServletWebServerFactory factory) {
         factory.setContextPath("");

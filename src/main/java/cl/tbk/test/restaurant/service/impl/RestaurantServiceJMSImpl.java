@@ -4,13 +4,13 @@ import cl.tbk.test.restaurant.App;
 import cl.tbk.test.restaurant.entities.ResumenVentas;
 import cl.tbk.test.restaurant.entities.Venta;
 import cl.tbk.test.restaurant.jms.JmsProducer;
-import cl.tbk.test.restaurant.service.PersistentStorageService;
 import cl.tbk.test.restaurant.service.VentaStorageService;
 import java.util.Calendar;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import cl.tbk.test.restaurant.service.RestaurantService;
 
 /**
  *
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Qualifier("JMS+DB")
-public class PersistentStorageServiceJMSImpl implements PersistentStorageService {
+public class RestaurantServiceJMSImpl implements RestaurantService {
 
     @Autowired
     private VentaStorageService ventaStorage;

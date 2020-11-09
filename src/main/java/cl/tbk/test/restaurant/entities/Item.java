@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cl.tbk.test.restaurant.entities;
 
 import java.io.Serializable;
@@ -15,7 +10,7 @@ import javax.persistence.Transient;
 
 /**
  * Entidad que almacena los detalles de un item<br/>
- *
+ * y calcula sus montos
  * @author manuelpinto
  */
 @Entity

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cl.tbk.test.restaurant.jms;
 
 import cl.tbk.test.restaurant.entities.ResumenVentas;
@@ -15,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**
- *
+ * Productor de JMS
  * @author manuelpinto
  */
 @Component
@@ -26,6 +21,11 @@ public class JmsProducer {
     @Value("${spring.activemq.topic}")
     private String topic;
 
+    /**
+     * Envía la fecha del reporte solicitado al consumidor y recibe el resumen de las ventas del dia
+     * @param fecha
+     * @return 
+     */
     public ResumenVentas sendMessage(Date fecha){
         try{
             Logger.getLogger(this.getClass().getCanonicalName()).info("Attempting Send message to Topic: "+ fecha);

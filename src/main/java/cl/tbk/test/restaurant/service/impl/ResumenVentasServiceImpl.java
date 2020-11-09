@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cl.tbk.test.restaurant.service.impl;
 
 import cl.tbk.test.restaurant.entities.Item;
@@ -21,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- *
+ * Servicio que genera el resumen de ventas
  * @author manuelpinto
  */
 @Service
@@ -32,6 +27,12 @@ public class ResumenVentasServiceImpl implements ResumenVentasService{
     
     public ResumenVentasServiceImpl(){}
     
+    /**
+     * Obtiene las ventas para el día desde la base y
+     * genera el resumen de ventas para el día especificado
+     * @param dia
+     * @return 
+     */
     @Override
     public ResumenVentas get(Date dia) {
         Calendar calendar=Calendar.getInstance();
@@ -44,10 +45,18 @@ public class ResumenVentasServiceImpl implements ResumenVentasService{
         ResumenVentas rv=new ResumenVentas();
         rv.setFechaVentas(calendar.getTime());
         rv.setGeneradoTimestamp(new Date());
+        // obtiene todas las ventas y suma la cantida de productos en los items que tenga cada una de ellas
         rv.setItemCount(ventas.parallelStream()
-                .map(Venta::getItems).flatMap(Collection::stream)
-                .mapToInt(Item::getCantidad).sum());
-        rv.setMontoTotal(ventas.parallelStream().map(Venta::getItems).flatMap(Collection::stream).map(i->i.getPrecioUnitario().multiply(new BigDecimal(i.getCantidad(),MathContext.DECIMAL64))).reduce(BigDecimal.ZERO, (subtotal, value)->subtotal.add(value)));
+                .map(Venta::getItems)
+                .flatMap(Collection::stream)
+                .mapToInt(Item::getCantidad)
+                .sum());
+        // obtiene todas las ventas, y suma sus montos
+        rv.setMontoTotal(
+                ventas.parallelStream()
+                        .map(Venta::getMontoTotalDeVenta)
+                        .reduce(BigDecimal.ZERO, (subtotal, value)->subtotal.add(value))
+        );
         rv.setVentaCount(ventas.size());
         rv.setVentas(ventas);
         return rv;

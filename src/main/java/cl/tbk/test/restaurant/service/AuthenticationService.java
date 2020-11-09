@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cl.tbk.test.restaurant.service;
 
 import cl.tbk.test.restaurant.entities.Credential;
@@ -11,7 +6,8 @@ import cl.tbk.test.restaurant.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 
 /**
- *
+ * Servicio de Autorización para dar por válido un usuario<br/>
+ * y obtener los Claims desde el token (para sacar el usuario del token)
  * @author manuelpinto
  */
 public interface AuthenticationService {

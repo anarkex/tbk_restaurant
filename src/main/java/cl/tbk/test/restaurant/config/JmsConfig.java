@@ -1,6 +1,5 @@
 package cl.tbk.test.restaurant.config;
 
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jms.ConnectionFactory;
@@ -15,7 +14,7 @@ import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
 /**
- *
+ * Configuración JMS
  * @author manuelpinto
  */
 @Configuration
@@ -26,12 +25,22 @@ public class JmsConfig {
     @Value("${spring.activemq.broker-url}")
     private String brokerUrl;
     
+    private static BrokerService brokerService;
+    
+    /**
+     * Levanta el activemq
+     * @return 
+     */
     @Bean
     public BrokerService brokerService(){
         try {
-            BrokerService brokerService=new BrokerService();
-            brokerService.addConnector(brokerUrl);
-            brokerService.start();
+            synchronized(JmsConfig.class){ // por is a caso
+                if(brokerService==null){
+                    brokerService=new BrokerService();
+                    brokerService.addConnector(brokerUrl);
+                    brokerService.start();
+                }
+            }
             return brokerService;
         } catch (Exception ex) {
             Logger.getLogger(JmsConfig.class.getName()).log(Level.SEVERE, null, ex);
@@ -39,17 +48,25 @@ public class JmsConfig {
         return null;
     }
     
+    /**
+     * connection factory
+     * @return 
+     */
     @Bean
     public ConnectionFactory connectionFactory(){
         brokerService();
         ActiveMQConnectionFactory activeMQConnectionFactory  = new ActiveMQConnectionFactory();
         activeMQConnectionFactory.setBrokerURL(brokerUrl);
         // Esto lo hago por hacerlo rápido, pero en prod tienen que poner cada uno de los que podrían ser serializados
-        //activeMQConnectionFactory.setTrustedPackages(Arrays.asList("cl.tbk.test.restaurant","java.util", "java.lang", "java.math"));
+        //activeMQConnectionFactory.setTrustedPackages(Arrays.asList("cl.tbk.test.restaurant","java.util", "java.lang", "java.math", ... ));
         activeMQConnectionFactory.setTrustAllPackages(true);
         return activeMQConnectionFactory;
     }
 
+    /**
+     * jmsTemplate simple para envio de mensajes JMS
+     * @return 
+     */
     @Bean
     public JmsTemplate jmsTemplate(){
         JmsTemplate jmsTemplate = new JmsTemplate();
@@ -58,12 +75,20 @@ public class JmsConfig {
         return jmsTemplate;
     }
 
+    /**
+     * jmsMessagingTemplate para envio de mensajes y recepción de respuesta (este es el que vamos a usar)
+     * @return 
+     */
     @Bean
     public JmsMessagingTemplate jmsMessagingTemplate(){
         JmsMessagingTemplate jmt=new JmsMessagingTemplate(jmsTemplate());
         return jmt;
     }
     
+    /**
+     * Activa el listener de mensajes
+     * @return 
+     */
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(){
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();

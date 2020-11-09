@@ -8,7 +8,6 @@ package cl.tbk.test.restaurant.service.impl;
 import cl.tbk.test.restaurant.App;
 import cl.tbk.test.restaurant.entities.ResumenVentas;
 import cl.tbk.test.restaurant.entities.Venta;
-import cl.tbk.test.restaurant.service.PersistentStorageService;
 import cl.tbk.test.restaurant.service.ResumenVentasService;
 import cl.tbk.test.restaurant.service.ValidatorService;
 import cl.tbk.test.restaurant.service.VentaStorageService;
@@ -28,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
+import cl.tbk.test.restaurant.service.RestaurantService;
 
 /**
  *
@@ -35,9 +35,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Qualifier("Hazelcast+DB")
-public class PersistentStorageServiceHazelcastImpl implements PersistentStorageService {    
+public class RestaurantServiceHazelcastImpl implements RestaurantService {    
     
-    private static final Logger LOG = Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(RestaurantServiceHazelcastImpl.class.getName());
 
     @Autowired
     private VentaStorageService ventaStorage;
@@ -63,7 +63,7 @@ public class PersistentStorageServiceHazelcastImpl implements PersistentStorageS
     @Autowired
     private HazelcastInstance hz;
     
-    public PersistentStorageServiceHazelcastImpl(){
+    public RestaurantServiceHazelcastImpl(){
     }
     
     @PostConstruct
@@ -117,7 +117,7 @@ public class PersistentStorageServiceHazelcastImpl implements PersistentStorageS
                         log.info("saved venta: "+venta.getId().toString());
                     }
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(RestaurantServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
             // Thread to consume and produce the resumenVenta
@@ -133,7 +133,7 @@ public class PersistentStorageServiceHazelcastImpl implements PersistentStorageS
                         log.info("Colocando el resumen disponible :"+rv.getFechaVentas());
                     }
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(RestaurantServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
         }
@@ -153,10 +153,10 @@ public class PersistentStorageServiceHazelcastImpl implements PersistentStorageS
         calendar.set(Calendar.SECOND,0);
         calendar.set(Calendar.MILLISECOND,0);
         if(resumenResults.containsKey(calendar.getTime())){
-            Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.INFO,"Refrescando el resumen para el día "+calendar.getTime());
+            Logger.getLogger(RestaurantServiceHazelcastImpl.class.getName()).log(Level.INFO,"Refrescando el resumen para el día "+calendar.getTime());
             resumenResults.remove(calendar.getTime());
             try{resumenQuery.put(calendar.getTime());}catch(InterruptedException e){
-                Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.INFO,"No pude solicitar el resumen para el dia "+calendar.getTime());
+                Logger.getLogger(RestaurantServiceHazelcastImpl.class.getName()).log(Level.INFO,"No pude solicitar el resumen para el dia "+calendar.getTime());
             }
         }
     }
@@ -172,12 +172,12 @@ public class PersistentStorageServiceHazelcastImpl implements PersistentStorageS
     public Venta store(Venta venta) {
         // Storage queue is infinite
         try {
-            Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.FINE, "Storing venta "+venta.getId());
+            Logger.getLogger(RestaurantServiceHazelcastImpl.class.getName()).log(Level.FINE, "Storing venta "+venta.getId());
             validatorService.validate(venta);
             toStorage.put(venta);
             return venta;
         } catch (InterruptedException ex) {
-            Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RestaurantServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException("Interrupted when trying to save venta "+venta.getId().toString());
         }
     }
@@ -191,14 +191,14 @@ public class PersistentStorageServiceHazelcastImpl implements PersistentStorageS
      */
     @Override
     public ResumenVentas get(int year, int month, int day) {
-        Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.FINE, "Getting resumen for "+year+"/"+month+"/"+day);
+        Logger.getLogger(RestaurantServiceHazelcastImpl.class.getName()).log(Level.FINE, "Getting resumen for "+year+"/"+month+"/"+day);
         Calendar calendar=Calendar.getInstance(TimeZone.getDefault());
         calendar.set(year, month-1, day, 0, 0, 0); // Why in the hell calendar uses JAN=0 DEC=11
         calendar.set(Calendar.MILLISECOND, 0);
         Date date=calendar.getTime();
         try {
             if(resumenResults.containsKey(date)){ // Si tenemos el resumen lo devolvemos
-                Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.INFO, "Resumen tomado de la bolsa de resumenes");
+                Logger.getLogger(RestaurantServiceHazelcastImpl.class.getName()).log(Level.INFO, "Resumen tomado de la bolsa de resumenes");
                 return resumenResults.get(date);
             }
             // si no, lo solicitamos..
@@ -217,7 +217,7 @@ public class PersistentStorageServiceHazelcastImpl implements PersistentStorageS
             } else
                 throw new RuntimeException("Request Timeout"); // no apareció nada en el mapa
         } catch (InterruptedException ex) {
-            Logger.getLogger(PersistentStorageServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RestaurantServiceHazelcastImpl.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException("Interrupted while waiting for VentaResumen");
         }
     }

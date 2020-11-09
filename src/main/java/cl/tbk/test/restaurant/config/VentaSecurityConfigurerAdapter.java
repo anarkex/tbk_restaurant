@@ -24,6 +24,11 @@ public class VentaSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter
     @Qualifier("jwtauth")
     Filter jwtAuthFilter;
 
+    /**
+     * DEelara que el path "/tbk/restaurant/v1/ventas/**" tiene que estar autorizado, los demás no.
+     * @param http
+     * @throws Exception 
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().headers().frameOptions().disable()

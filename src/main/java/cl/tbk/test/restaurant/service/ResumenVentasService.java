@@ -9,9 +9,14 @@ import cl.tbk.test.restaurant.entities.ResumenVentas;
 import java.util.Date;
 
 /**
- *
+ * Generador de resumen de ventas
  * @author manuelpinto
  */
 public interface ResumenVentasService {
+    /**
+     * Genera un resumen de ventas para el día
+     * @param date
+     * @return 
+     */
     ResumenVentas get(Date date);
 }

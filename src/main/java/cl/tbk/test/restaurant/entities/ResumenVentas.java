@@ -14,7 +14,8 @@ import java.util.Objects;
 
 /**
  * Entidad que entrega el reporte solicitado por /ventas/report/a/m/d <br/>
- * Esta entidad es cachada en el cluster hazelcast
+ * Esta entidad es cachada en el cluster hazelcast<br/>
+ * Esta entidad calcula sus montos y cuentas
  * @author manuelpinto
  */
 public class ResumenVentas implements Serializable{

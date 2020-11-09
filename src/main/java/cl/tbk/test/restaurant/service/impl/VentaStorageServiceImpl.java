@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cl.tbk.test.restaurant.service.impl;
 
 import cl.tbk.test.restaurant.entities.Venta;
@@ -13,13 +8,12 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- *
+ * Servicio para recuperar ventas desde la base
  * @author manuelpinto
  */
 @Service
@@ -33,11 +27,20 @@ public class VentaStorageServiceImpl implements VentaStorageService {
     public VentaStorageServiceImpl() {
     }
     
+    /**
+     * guarda la venta en la base
+     * @param venta 
+     */
     @Override
     public void store(Venta venta) {
         repo.save(venta);
     }
 
+    /**
+     * Obtiene las ventas de un día desde la base.
+     * @param fecha
+     * @return 
+     */
     @Override
     public Collection<Venta> getVentas(Date fecha) {
         Calendar calendar=Calendar.getInstance();

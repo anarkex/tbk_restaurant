@@ -3,7 +3,6 @@ package cl.tbk.test.restaurant.controllers;
 import cl.tbk.test.restaurant.entities.ResumenVentas;
 import cl.tbk.test.restaurant.entities.Venta;
 import cl.tbk.test.restaurant.exception.ValidationException;
-import cl.tbk.test.restaurant.service.PersistentStorageService;
 import java.util.Date;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import cl.tbk.test.restaurant.service.RestaurantService;
 
 /**
  * Segunda parte del test, guarda venta y recupera resumen del día<br/>
@@ -30,7 +30,7 @@ public class VentaController {
     @Autowired
     @Qualifier("JMS+DB")
     //@Qualifier("Hazelcast+DB")
-    private PersistentStorageService persistenceService;
+    private RestaurantService persistenceService;
     
     public VentaController() {
     }

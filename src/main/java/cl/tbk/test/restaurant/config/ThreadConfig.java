@@ -12,6 +12,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class ThreadConfig {
 
+    /**
+     * Para limpiar las colas Hazelcast de peticiones se usarán 2 threads,
+     * uno para guardar las ventas
+     * otro para generar los reportes.
+     * @return 
+     */
     @Bean(name = "databaseTaskExecutor")
     public TaskExecutor threadPoolTaskExecutor(){
         ThreadPoolTaskExecutor executor=new ThreadPoolTaskExecutor();

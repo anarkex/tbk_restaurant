@@ -17,7 +17,8 @@ public class ValidatorServiceImpl implements ValidatorService{
     
     /**
      * Valida una venta y sus items.<br/>
-     * No calcula sobre sumas porque esos son @Transient
+     * No calcula sobre sumas porque esos son @Transient<br/>
+     * solo valida que tenga id
      * @param venta 
      */
     @Override
@@ -25,7 +26,11 @@ public class ValidatorServiceImpl implements ValidatorService{
         if(venta.getId()==null) throw new ValidationException("Venta ID es nulo");
         venta.getItems().parallelStream().forEach(i->validate(i));
     }
-    
+    /**
+     * Valida un item por separado<br/>
+     * que tenga id, cantidad, codigo y precio
+     * @param item 
+     */
     @Override
     public void validate(Item item){
         if(item.getId()==null) throw new ValidationException("item id es nulo");

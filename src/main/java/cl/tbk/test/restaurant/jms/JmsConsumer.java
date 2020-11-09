@@ -1,6 +1,5 @@
 package cl.tbk.test.restaurant.jms;
 
-
 import cl.tbk.test.restaurant.entities.ResumenVentas;
 import cl.tbk.test.restaurant.service.ResumenVentasService;
 import java.util.Date;
@@ -17,6 +16,11 @@ import org.apache.activemq.command.ActiveMQObjectMessage;
 import org.apache.log4j.Logger;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 
+/**
+ * Consumidor de JMS
+ * @author manuelpinto
+ */
+
 @Component
 public class JmsConsumer implements SessionAwareMessageListener<Message> {
 
@@ -24,6 +28,12 @@ public class JmsConsumer implements SessionAwareMessageListener<Message> {
     @Autowired
     ResumenVentasService resumenVentasService;
 
+    /**
+     * Recibe la fecha para generar el resumen y devuelve el resultado
+     * @param message
+     * @param session
+     * @throws JMSException 
+     */
     @Override
     @JmsListener(destination = "${spring.activemq.topic}")
     public void onMessage(Message message, Session session) throws JMSException {
