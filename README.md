@@ -20,24 +20,24 @@ El desarrollo fue iniciado el Mie. 4 de Nov del 2020 a las 10pm +/-
     - el endpoint del login responde con un usuario, token y tipo de token, hoy el token es Bearer (JWT)
 2. El usuario envía los datos de una venta al endpoint de agregar ventas ( POST /ventas/add ) además del header Authorization Bearer con el token recuperado en 1
     - el endpoint devuelve los datos de la venta almacenada
-3. El usuario envía una petición al endpoint de resumen diario de ventas con el día que quiere revisar ( POST /ventas/resume/2000/5/24 ) además del header Authorization Bearer con el token recuperado en 1
+3. El usuario envía una petición al endpoint de resumen diario de ventas con el día que quiere revisar ( POST /ventas/resume/2000/5/24 ) además del header `Authorization Bearer` con el token recuperado en 1
     - el endpoint recopila los datos y genera un resumen diario de ventas
 
 ### Excepciones
 1. El usuario envía su username y password equivocados al login ( POST /login )
-    - el sistema devuelve el error HTTP 401 Unauthorized
+    - el sistema devuelve el error `HTTP 401 Unauthorized`
 2. El usuario envia una peticion mal formada al login ( POST /login )
-    - el sistema devuelve el error HTTP 400 Bad Request
+    - el sistema devuelve el error `HTTP 400 Bad Request`
 3. El usuario envia una peticion de agregar venta mal formada ( POST /ventas/add )
-    - el sistema devuelve un HTTP 400 Bad Request
+    - el sistema devuelve un `HTTP 400 Bad Request`
 4. El usuario envía una peticion de agregar venta sin el token o con el token errado ( POST /ventas/add )
-    - el sistema devuelve un HTTP 403 Forbidden
+    - el sistema devuelve un `HTTP 403 Forbidden`
 5. El usuario envía una peticion de solicitud de resumen con una fecha errada ( POST /ventas/resume/2020/01/723 )
     - el sistema interpreta esa fecha y devuelve el reporte para la fecha interpretada (723 dias desde el 1 de enero del 2020 para la fecha solicitada)
 6. El usuario envía una peticion de solicitid de resumen para una fecha sin ventas ( POST /ventas/resume/2030/01/01 )
     - el sistema devuelve un resumen sin ventas con cuenta de montos, items y ventas en 0.
 7. El usuario envía una peticion de solicitud de resumen sin el token o con el token errado ( POST /ventas/resume/2020/10/23 )
-    - el sistema devuelve un HTTP 403 Forbidden
+    - el sistema devuelve un `HTTP 403 Forbidden`
 
 ## Solución
 
@@ -46,7 +46,7 @@ El desarrollo fue iniciado el Mie. 4 de Nov del 2020 a las 10pm +/-
 
 "el cual debe aceptar un nombre y usuario y contraseña" : Asumo que dice "nombre DE usuario y contraseña" y que es sólo un nombre de usuario y una contraseña.
 
-"deben ser almacenadas de manera segura": Asumo que esto significa que deben estar en algun archivo de configuracion encriptados, los meti en application.properties encriptado con jasypt
+"deben ser almacenadas de manera segura": Asumo que esto significa que deben estar en algun archivo de configuracion encriptados, los meti en `application.properties` encriptado con jasypt
 El nombre de usuario es "transbank" y la clave es "test"
 
 El login devuelve la siguiente estructura:
@@ -60,13 +60,13 @@ El login devuelve la siguiente estructura:
 ``` 
 Las llamadas a `/ventas/**` deben ser encabezadas con `Authorization Bearer <token>`
 
-El /login está restringido a `${application.properties:auth.maxLoginAttempts}` intentos dentro de 30 segundos. Si el atacante intenta logearse de nuevo dentro de esos 30 segundos el tiempo se reinicia. La restricción está hacia el usuario, no hacia la IP.
+El /login está restringido a `application.properties:${auth.maxLoginAttempts}` intentos dentro de 30 segundos. Si el atacante intenta logearse de nuevo dentro de esos 30 segundos el tiempo se reinicia. La restricción está hacia el usuario, no hacia la IP.
 
 No le puse certificado SSL al servidor que levanta el jar porque es sólo una prueba y esto va a estar en localhost, pero en un entorno real Debería tener SSL. En mi máquina de pruebas si tiene SSL porque está detrás de un proxy reverso.
 
 ### 2. "Api para crear ventas y otra que devuelve el listado de ventas del dia"
-- /ventas/resume/{año}/{mes}/{dia} : obtiene un objeto JSON de resumen de la venta
-- /ventas/add : se le entrega un objeto venta para guardarlo. Si el objeto tiene el mismo id que alguno que ya estaba en la base, simplemente lo pisa. Si la venta va sin fecha, el sistema le pone la fecha. También como auditoría guarda el usuario que subió la venta (que en estos casos es el mismo).
+- `/ventas/resume/{año}/{mes}/{dia}` : obtiene un objeto JSON de resumen de la venta
+- `/ventas/add` : se le entrega un objeto venta para guardarlo. Si el objeto tiene el mismo id que alguno que ya estaba en la base, simplemente lo pisa. Si la venta va sin fecha, el sistema le pone la fecha. También como auditoría guarda el usuario que subió la venta (que en estos casos es el mismo).
 En el archivo swagger.yml aparece como llamar a estos servicios.
 - La venta registra id (generado en el cliente usando UUID, es poco probable que se repita, pero no imposible), una fecha de venta (que es cuando se inserta), un id de sucursal (que es sólo un id que podría estar referenciado en los códigos de sucursal que se le entregagron al SII), el usuario que inyectó esta venta en el sistema y un listado de items (sin asegurar orden).
 - El ítem registra su ID de item, un código de producto (que en mi idea es el código de barras del producto), la cantidad, el precio unitario y el detalle.
@@ -75,7 +75,7 @@ En el archivo swagger.yml aparece como llamar a estos servicios.
 ### 3. "ventas del día tiene alto uso --> JMS"
 - No entendí bien que hay que hacer aqui, pero... hice servicios de persistencia y recuperación con *Hazelcast* y otra interfaz con *JMS*. 
 
-*Hazelcast+ : No lo he porbado con múltiples nodos, pero se supone que podria subir varias instancias del sistema en distintas maquinas (bajo la misma máscara de subred, pq funciona esn multicast) y todas funcionarian juntas. En condiciones normales cada uno de esos nodos tendria acceso a la base, pero en estas condiciones de test todos los nodos levantan una instancia h2, pero solo un nodo (el primero) trabaja como la base de datos guardando y recuperando datos usando una Queue. 
+*Hazelcast* : No lo he porbado con múltiples nodos, pero se supone que podria subir varias instancias del sistema en distintas maquinas (bajo la misma máscara de subred, pq funciona esn multicast) y todas funcionarian juntas. En condiciones normales cada uno de esos nodos tendria acceso a la base, pero en estas condiciones de test todos los nodos levantan una instancia h2, pero solo un nodo (el primero) trabaja como la base de datos guardando y recuperando datos usando una Queue. 
 La ventaja con Hazelcast es que maneja un caché en memoria distribuída de forma que si piden un resumen de ventas con espacios de menos de 5 minutos (no recuerdo cuanto le puse) el reporte se mantiene en el caché por otros 5 minutos hasta que ya nadie lo pide y se pierde, cuando se perdió y lo solicitan de nuevo el sistema lo toma de la base y lo deja disponible de nuevo. También si el reporte está en caché e ingresan una nueva venta el sistema va a refrescar el reporte si es que estba en el caché.
 Los resumenes se mantienen en caché indexados por fecha de ventas.
 
@@ -84,7 +84,7 @@ En mi implementación de este sistema la generación de resumenes postea una fec
 *JMS* : ActiveMQ + SpringJMS ...  
 Este no tiene un caché de reportes (no se si se pueda) y cada peticion de resumen es una petición nueva. Si piden 15 resúmenes para el mismo día cada resumen se genera nuevamente desde la base y se deja disponible en la cola de recepción. No me gusta la idea de persistir estos reportes porque si aparece una venta hay que refrescarlo, lo que se podría implementar es un Store procedure para generarlos en la base (no se si h2 me deja hacer eso).
 
-- Si me preguntan a mi, yo creo que Hazelcast va a ser bastante mas rápido, eficiente y escalable que JMS
+*** Si me preguntan a mi, yo creo que Hazelcast va a ser bastante mas rápido, eficiente y escalable que JMS ***
 
 ### 4. "Librerias" 
 Spring, ActiveMQ, Hazelcast, H2, Hibernate, Jasypt, jsonwebtoken.
@@ -94,17 +94,16 @@ Hibernate no es de mi completo agrado porque me hace perder el control en un fac
 ### 5. Documentacion: 
 Dejé un archivo `swagger.yml` en el directorio. Está configurado para funcionar contra una máquina activa: https://comprando.cl/tbk
 
-Y este readme.md para dar una pincelada de lo que hay adentro.
+Y este `readme.md` para dar una pincelada de lo que hay adentro.
 
 También dejé un export de postman para enviar peticiones.
 
-## Este sistema necesita testing intenso. Sólo se crearon JUnit para probarlo (se ejecuta durante el build de maven).
+### Este sistema necesita testing intenso. Sólo se crearon JUnit para probarlo (se ejecuta durante el build de maven).
 
-====
 ## ISSUES Conocidos:
 - No va a iniciar varias veces en el mismo servidor por conflicto de puertos de activemq y h2
 - la base de datos h2 crea su datafile en el lugar donde el usuario haya levantado la aplicacion
-- Un acceso sin token a un servicio resulta en un error 403 Forbidden en vez del que corresponde 401 Unauthorized.
+- Un acceso sin token a un servicio resulta en un error `403 Forbidden` en vez del que corresponde `401 Unauthorized` .
 - demora mucho en levantar
 - Hay clases que no estoy seguro si deberían llamarse así o de otra forma, lo que si se es que necesita refactorizacion
 - A causa de que hoy en día todos usamos pantallas de 16:9 y nadie imprime el código en matriz de puntos es que no seguí ningúna regla de 80 caracteres de ancho.
