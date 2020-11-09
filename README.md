@@ -19,7 +19,9 @@ El desarrollo fue iniciado el Mie. 4 de Nov del 2020 a las 10pm +/-
 
 ### 1. ***Exponer el endpoint del login, el cual debe aceptar un ~~nombre y~~ usuario y contraseña, las cuales deben ser almacenadas de manera segura, como es un ejemplo, no es necesario crear una api de creación de usuario y basta con dejar en el Readme las credenciales (nombre de usuario y contraseña) creada previamente para poder simular al llamada al login exitoso.***
  El sistema es un api json que tiene un /login con un payload `{ "username": "transbank", "password": "test" }` .
+
 "el cual debe aceptar un nombre y usuario y contraseña" : Asumo que dice "nombre DE usuario y contraseña" y que es sólo un nombre de usuario y una contraseña.
+
 "deben ser almacenadas de manera segura": Asumo que esto significa que deben estar en algun archivo de configuracion encriptados, los meti en application.properties encriptado con jasypt
 El nombre de usuario es "transbank" y la clave es "test"
 
@@ -51,7 +53,7 @@ JMS: ActiveMQ + SpringJMS ...
 Spring, ActiveMQ, Hazelcast, H2, Jasypt, jsonwebtoken.
 
 ### 5. Documentacion: 
-Dejé un archivo swagger.yml en el directorio. Está configurado para funcionar contra una máquina activa: https://comprando.cl/tbk
+Dejé un archivo `swagger.yml` en el directorio. Está configurado para funcionar contra una máquina activa: https://comprando.cl/tbk
 También dejé un export de postman
 
 ====
