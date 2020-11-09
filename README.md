@@ -13,12 +13,12 @@ el requerimiento fue:
 4. Las herramientas, librerías y otros componentes de Spring son de uso libre, el candidato puede elegir cuales necesita o desee usar
 5. Se debe finalmente proveer la documentación de la API construida, mediante alguna herramienta de libre elección destinada para estos propósitos, siguiendo el enfoque (bottom-up), swagger por ejemplo.
 
-El desarrollo fue iniciado el Mie. 4 de Nov del 2020 a las 10pm +/-
+El desarrollo fue iniciado el Mie. 4 de Nov del 2020 a las 10pm +/-. Este desarrollo está pensado como un primer ciclo en el SDLC.
 
 ## Flujo de la solucion (historia)
 1. El usuario envía su username y password al endpoint de login ( POST /login )
     - el endpoint del login responde con un usuario, token y tipo de token, hoy el token es Bearer (JWT)
-2. El usuario envía los datos de una venta al endpoint de agregar ventas ( POST /ventas/add ) además del header Authorization Bearer con el token recuperado en 1
+2. El usuario envía los datos de una venta al endpoint de agregar ventas ( POST /ventas/add ) además del header `Authorization Bearer` con el token recuperado en 1
     - el endpoint devuelve los datos de la venta almacenada
 3. El usuario envía una petición al endpoint de resumen diario de ventas con el día que quiere revisar ( POST /ventas/resume/2000/5/24 ) además del header `Authorization Bearer` con el token recuperado en 1
     - el endpoint recopila los datos y genera un resumen diario de ventas
@@ -47,7 +47,7 @@ El desarrollo fue iniciado el Mie. 4 de Nov del 2020 a las 10pm +/-
 "el cual debe aceptar un nombre y usuario y contraseña" : Asumo que dice "nombre DE usuario y contraseña" y que es sólo un nombre de usuario y una contraseña.
 
 "deben ser almacenadas de manera segura": Asumo que esto significa que deben estar en algun archivo de configuracion encriptados, los meti en `application.properties` encriptado con jasypt
-El nombre de usuario es "transbank" y la clave es "test"
+El nombre de usuario es "transbank" y la clave es "test" y la clave de jasypt es "tbk"
 
 El login devuelve la siguiente estructura:
 ```
@@ -60,14 +60,14 @@ El login devuelve la siguiente estructura:
 ``` 
 Las llamadas a `/ventas/**` deben ser encabezadas con `Authorization Bearer <token>`
 
-El /login está restringido a `application.properties:${auth.maxLoginAttempts}` intentos dentro de 30 segundos. Si el atacante intenta logearse de nuevo dentro de esos 30 segundos el tiempo se reinicia. La restricción está hacia el usuario, no hacia la IP.
+El `/login` está restringido a `application.properties:${auth.maxLoginAttempts}` intentos dentro de 30 segundos. Si el atacante intenta logearse de nuevo dentro de esos 30 segundos el tiempo se reinicia. La restricción está hacia el usuario, no hacia la IP.
 
 No le puse certificado SSL al servidor que levanta el jar porque es sólo una prueba y esto va a estar en localhost, pero en un entorno real Debería tener SSL. En mi máquina de pruebas si tiene SSL porque está detrás de un proxy reverso.
 
 ### 2. "Api para crear ventas y otra que devuelve el listado de ventas del dia"
 - `/ventas/resume/{año}/{mes}/{dia}` : obtiene un objeto JSON de resumen de la venta
 - `/ventas/add` : se le entrega un objeto venta para guardarlo. Si el objeto tiene el mismo id que alguno que ya estaba en la base, simplemente lo pisa. Si la venta va sin fecha, el sistema le pone la fecha. También como auditoría guarda el usuario que subió la venta (que en estos casos es el mismo).
-En el archivo swagger.yml aparece como llamar a estos servicios.
+En el archivo `src/main/resources/swagger.yml` aparece como llamar a estos servicios.
 - La venta registra id (generado en el cliente usando UUID, es poco probable que se repita, pero no imposible), una fecha de venta (que es cuando se inserta), un id de sucursal (que es sólo un id que podría estar referenciado en los códigos de sucursal que se le entregagron al SII), el usuario que inyectó esta venta en el sistema y un listado de items (sin asegurar orden).
 - El ítem registra su ID de item, un código de producto (que en mi idea es el código de barras del producto), la cantidad, el precio unitario y el detalle.
 - El resumen de venta tiene una fecha de generado, una fecha de ventas, la cuenta de los items, la cuenta de las ventas del dia, el monto total y un listado de ventas sin asegurar orden. El resumen no se guarda en la base, es generado a partir de los datos de la base de datos cada vez que alguien lo requiere.
@@ -79,7 +79,7 @@ En el archivo swagger.yml aparece como llamar a estos servicios.
 La ventaja con Hazelcast es que maneja un caché en memoria distribuída de forma que si piden un resumen de ventas con espacios de menos de 5 minutos (no recuerdo cuanto le puse) el reporte se mantiene en el caché por otros 5 minutos hasta que ya nadie lo pide y se pierde, cuando se perdió y lo solicitan de nuevo el sistema lo toma de la base y lo deja disponible de nuevo. También si el reporte está en caché e ingresan una nueva venta el sistema va a refrescar el reporte si es que estba en el caché.
 Los resumenes se mantienen en caché indexados por fecha de ventas.
 
-En mi implementación de este sistema la generación de resumenes postea una fecha para resumen y luego se queda esperando a que aparezca en el caché de resúmenes, si demora más de 5 segundos ( ${application.prperties:resumeTimeout} ) la petición falla por timeout.
+En mi implementación de este sistema la generación de resumenes postea una fecha para resumen y luego se queda esperando a que aparezca en el caché de resúmenes, si demora más de 5 segundos ( `application.prperties:${resumeTimeout}` ) la petición falla por timeout.
 
 *JMS* : ActiveMQ + SpringJMS ...  
 Este no tiene un caché de reportes (no se si se pueda) y cada peticion de resumen es una petición nueva. Si piden 15 resúmenes para el mismo día cada resumen se genera nuevamente desde la base y se deja disponible en la cola de recepción. No me gusta la idea de persistir estos reportes porque si aparece una venta hay que refrescarlo, lo que se podría implementar es un Store procedure para generarlos en la base (no se si h2 me deja hacer eso).
@@ -92,7 +92,7 @@ Spring, ActiveMQ, Hazelcast, H2, Hibernate, Jasypt, jsonwebtoken.
 Hibernate no es de mi completo agrado porque me hace perder el control en un factor crítico como es la creación de queries optimizadas para la base, pero esto es un test.
 
 ### 5. Documentacion: 
-Dejé un archivo `swagger.yml` en el directorio. Está configurado para funcionar contra una máquina activa: https://comprando.cl/tbk
+Dejé un archivo `src/main/resources/swagger.yml` en el repo. Está configurado para funcionar contra una máquina activa: https://comprando.cl/tbk
 
 Y este `readme.md` para dar una pincelada de lo que hay adentro.
 
