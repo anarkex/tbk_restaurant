@@ -1,0 +1,165 @@
+{
+	"info": {
+		"_postman_id": "c382e9a8-13ae-49e4-b563-a7f9c9fca13d",
+		"name": "Transbank MPM Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Restaurant Login",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true,
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"transbank\",\n    \"password\": \"teset\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/tbk/restaurant/v1/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"tbk",
+						"restaurant",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transbank Restaurant AddSale1 on Comprando",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIke2F1dGgudG9rZW5JZE5hbWUiLCJzdWIiOiJ0cmFuc2JhbmsiLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNjA0Njk1NjkyLCJleHAiOjE2MDQ2OTY1OTJ9.aWTefZ9QzI9pm_noxRHIfH-ruQshEyaLS2uTuwj-Yi6COhIdNpPfhlLxoQXrFvwK7SsXln_rFsUDQYzX0g9rgw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIke2F1dGgudG9rZW5JZE5hbWUiLCJzdWIiOiJhbmFya28iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNjA0NTgwOTkxLCJleHAiOjE2MDQ1ODE4OTF9.YlyGbIJiCzVHi0WaQ79256abzpRtFksG-ujUTeDouJ2Qwlj7te6pnhhZ6pOjUae4Xd5uacmQQBfXwtWHeu9aNg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"19a31f12-8f76-43b2-bc4e-03df1d7c0bd1\",\n    \"items\":[\n        {\n            \"id\": \"9e76c18f-f27c-4c20-9d6a-1f27da5b26f6\",\n            \"codigo\": 70003040202,\n            \"cantidad\": 14,\n            \"precioUnitario\": 1200,\n            \"detalle\": \"Confort Noble 6 unidades\"\n        },\n        {\n            \"id\": \"9e76c18f-f27c-4c20-9d6a-1f27da5b26f7\",\n            \"codigo\": 70003040203,\n            \"cantidad\": 24,\n            \"precioUnitario\": 500,\n            \"detalle\": \"Super8\"  \n        }\n    ],\n    \"sucursalId\": 13,\n    \"username\": \"transbank\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/tbk/restaurant/v1/ventas/add",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"tbk",
+						"restaurant",
+						"v1",
+						"ventas",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transbank Restaurant Resumen on Comprando",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIke2F1dGgudG9rZW5JZE5hbWUiLCJzdWIiOiJ0cmFuc2JhbmsiLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNjA0Njk5OTY4LCJleHAiOjE2MDQ3MDA4Njh9.BWM1zphwyhs8iRSnl8LZTvSsR4J3Y1rvpFn5Ay7pTmvX0PKsY1Tk_8P6IqBiK-_nvd9AAV2WDJVH4YO2czDapQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiIke2F1dGgudG9rZW5JZE5hbWUiLCJzdWIiOiJhbmFya28iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNjA0NTgwNjgxLCJleHAiOjE2MDQ1ODE1ODF9.KlEIlcTak_tkbjtgqldXL6VqPLLE8X0aBueCVMJcAxC8E2ilx1Sz1LVmBOrHZ7IJt6TH8hmpOKhTl8vGWz7jBg"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/tbk/restaurant/v1/ventas/resume/2020/11/06",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"tbk",
+						"restaurant",
+						"v1",
+						"ventas",
+						"resume",
+						"2020",
+						"11",
+						"06"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
