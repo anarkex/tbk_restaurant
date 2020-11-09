@@ -122,3 +122,4 @@ También dejé un export de postman para enviar peticiones.
 - Esto necesita una pulida en cuanto a que dependencias son realmente necesarias para hacer el paquete mas pequeño
 - No tengo mucha experiencia configurando JMS/ActiveMQ, antes de esto lo había usado como POC en Glassfish 3 (hace años).
 - No soy un experto con Hazelcast, pero me gusta el approach que tiene para distribuir.
+- Swagger fue algo que no conocía
