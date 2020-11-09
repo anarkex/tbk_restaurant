@@ -84,7 +84,7 @@ En mi implementación de este sistema la generación de resumenes postea una fec
 *JMS* : ActiveMQ + SpringJMS ...  
 Este no tiene un caché de reportes (no se si se pueda) y cada peticion de resumen es una petición nueva. Si piden 15 resúmenes para el mismo día cada resumen se genera nuevamente desde la base y se deja disponible en la cola de recepción. No me gusta la idea de persistir estos reportes porque si aparece una venta hay que refrescarlo, lo que se podría implementar es un Store procedure para generarlos en la base (no se si h2 me deja hacer eso).
 
-*** Si me preguntan a mi, yo creo que Hazelcast va a ser bastante mas rápido, eficiente y escalable que JMS ***
+***Si me preguntan a mi, yo creo que Hazelcast va a ser bastante mas rápido, eficiente y escalable que JMS***
 
 ### 4. "Librerias" 
 Spring, ActiveMQ, Hazelcast, H2, Hibernate, Jasypt, jsonwebtoken.
