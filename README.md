@@ -13,7 +13,7 @@ el requerimiento fue:
 4. Las herramientas, librerías y otros componentes de Spring son de uso libre, el candidato puede elegir cuales necesita o desee usar
 5. Se debe finalmente proveer la documentación de la API construida, mediante alguna herramienta de libre elección destinada para estos propósitos, siguiendo el enfoque (bottom-up), swagger por ejemplo.
 
-El desarrollo fue iniciado el Mie. 4 de Nov del 2020 a las 10pm +/-. Este desarrollo está pensado como un primer ciclo en el SDLC.
+El desarrollo fue iniciado el Mie. 4 de Nov del 2020 a las 10pm +/-. Este desarrollo está pensado como un primer ciclo en el SDLC esperando feedback.
 
 ## Flujo de la solucion (historia)
 1. El usuario envía su username y password al endpoint de login ( POST /login )
@@ -107,3 +107,5 @@ También dejé un export de postman para enviar peticiones.
 - demora mucho en levantar
 - Hay clases que no estoy seguro si deberían llamarse así o de otra forma, lo que si se es que necesita refactorizacion
 - A causa de que hoy en día todos usamos pantallas de 16:9 y nadie imprime el código en matriz de puntos es que no seguí ningúna regla de 80 caracteres de ancho.
+- El sistema esta en blanco, debes subir un par de ventas para un día en específico y luego pedir el resumen diario de ese día
+- Cambiar entre `Hazelcast` y `JMS`, para la generación del reporte, se hace cambiando el `@Qualifier` de `RestaurantService` en el `VentaController`
