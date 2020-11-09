@@ -121,4 +121,4 @@ También dejé un export de postman para enviar peticiones.
 - Cambiar entre `Hazelcast` y `JMS`, para la generación del reporte, se hace cambiando el `@Qualifier` de `RestaurantService` en el `VentaController`
 - Esto necesita una pulida en cuanto a que dependencias son realmente necesarias para hacer el paquete mas pequeño
 - No tengo mucha experiencia configurando JMS/ActiveMQ, antes de esto lo había usado como POC en Glassfish 3 (hace años).
-- Hazelcast es un juguete nuevo para mi
+- No soy un experto con Hazelcast, pero me gusta el approach que tiene para distribuir.
